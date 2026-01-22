@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Propiedad - Daniel Brarda Inmobiliaria</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Estilos específicos para detalle.html */
+
+        /* Media Strip (Interactive JS Scroll) */
+        .media-strip-container {
+            width: 100%;
+            height: 60vh;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-x: auto;
+            /* Enable scroll */
+            overflow-y: hidden;
+            position: relative;
+            background: #000;
+            margin-top: 0;
+            cursor: grab;
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE */
+        }
+
+        .media-strip-container::-webkit-scrollbar {
+            display: none;
+            /* Chrome/Safari */
+        }
+
+        .media-strip-track {
+            display: flex;
+            height: 100%;
+            width: max-content;
+            /* Animation handled by JS for interaction support */
+        }
+
+        .media-strip-container:active {
+            cursor: grabbing;
+        }
+
+        .media-strip-item {
+            height: 100%;
+            flex-shrink: 0;
+            position: relative;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .media-strip-item:hover {
+            opacity: 0.9;
+        }
+
+        .media-strip-item img,
+        .media-strip-item video {
+            height: 100%;
+            width: auto;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+            /* Allow drag on container */
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .lightbox.show {
+            opacity: 1;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10000;
+            transition: 0.3s;
+        }
+
+        .lightbox-close:hover {
+            color: var(--primary);
+        }
+
+        .lightbox-prev,
+        .lightbox-next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            padding: 16px;
+            margin-top: -22px;
+            color: white;
+            font-weight: bold;
+            font-size: 30px;
+            transition: 0.3s ease;
+            user-select: none;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 3px;
+        }
+
+        .lightbox-prev:hover,
+        .lightbox-next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .lightbox-prev {
+            left: 20px;
+        }
+
+        .lightbox-next {
+            right: 20px;
+        }
+
+        /* ... existing styles ... */
+
+        /* Agent Widget Updates */
+        /* ... handled in HTML structure ... */
+
+
+        /* Detalle Contenido */
+        .detalle-section {
+            padding: 60px 0;
+            background: #fff;
+        }
+
+        .detalle-header {
+            margin-bottom: 40px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 30px;
+        }
+
+        .detalle-title h1 {
+            font-size: 2.2rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .detalle-location {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .detalle-price {
+            font-size: 2rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .detalle-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 50px;
+        }
+
+        .detalle-main h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            color: #555;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .feature-item i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .description-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #444;
+            margin-bottom: 40px;
+            white-space: pre-line;
+            /* Respetar saltos de línea */
+        }
+
+        /* Sidebar Contacto */
+        .contacto-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 100px;
+            border: 1px solid #eee;
+        }
+
+        .contacto-card h3 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .btn-whatsapp-full {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #25D366;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            margin-bottom: 15px;
+            transition: 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .btn-whatsapp-full:hover {
+            background: #1ebc57;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        @media (max-width: 992px) {
+            .detalle-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contacto-card {
+                position: static;
+                margin-top: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header id="main-header">
+        <div class="header-main">
+            <div class="container">
+                <div class="logo">
+                    <img src="https://www.danielbrarda.com.ar/wp-content/uploads/2020/10/logo8.png" alt="Daniel Brarda">
+                </div>
+                <!-- Menú idéntico -->
+                <nav class="main-nav" id="main-nav">
+                    <ul>
+                        <li><a href="index.html">Inicio</a></li>
+                        <li>
+                            <a href="propiedades.html">Propiedades <i class="fas fa-chevron-down"
+                                    style="font-size: 0.7em; margin-left: 5px;"></i></a>
+                            <ul class="sub-menu">
+                                <li><a href="propiedades.html?operacion=Venta">En Venta</a></li>
+                                <li><a href="propiedades.html?operacion=Alquiler">En Alquiler</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="index.html#servicios">Servicios</a></li>
+                        <li><a href="index.html#sobre-nosotros">Nosotros</a></li>
+                        <li><a href="index.html#noticias">Noticias</a></li>
+                        <li><a href="index.html#contacto">Contacto</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-toggle" id="mobile-toggle"><i class="fas fa-bars"></i></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Strip de Medias (Video/Fotos) -->
+    <section class="media-strip-container" id="media-strip">
+        <div class="media-strip-track" id="media-track">
+            <!-- JS Inject Images Here -->
+        </div>
+    </section>
+
+    <section class="detalle-section">
+        <div class="container">
+            <div id="loading-msg" style="text-align: center; padding: 50px;">Cargando propiedad...</div>
+            <div id="error-msg" style="text-align: center; padding: 50px; color: red; display: none;">Propiedad no
+                encontrada.</div>
+
+            <div id="detalle-content" style="display: none;">
+                <div class="detalle-header">
+                    <div class="detalle-title">
+                        <span class="property-badge"
+                            style="position: relative; top: auto; left: auto; display: inline-block; margin-bottom: 15px; background: var(--secondary);"
+                            id="detail-badge">TIPO</span>
+                        <h1 id="detail-title">Título de la Propiedad</h1>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
+                        <div class="detalle-location">
+                            <i class="fas fa-map-marker-alt" style="color: var(--primary);"></i> <span
+                                id="detail-address">Dirección, Ciudad</span>
+                        </div>
+                        <div class="detalle-price" id="detail-price">USD 000.000</div>
+                    </div>
+                </div>
+
+                <div class="detalle-grid">
+                    <div class="detalle-main">
+                        <h3>Descripción</h3>
+                        <div class="description-text" id="detail-description">
+                            <!-- Descripción larga -->
+                        </div>
+
+                        <div class="feature-list" id="detail-features">
+                            <!-- JS Inject Features -->
+                        </div>
+
+                        <h3>Ubicación</h3>
+                        <div id="map-container"
+                            style="width: 100%; height: 400px; background: #eee; border-radius: 12px; overflow: hidden; margin-top: 20px;">
+                            <!-- Iframe mapa -->
+                        </div>
+                    </div>
+
+                    <aside class="detalle-sidebar">
+                        <div class="contacto-card">
+                            <h3 style="margin-top: 0;">Corredor Daniel Brarda</h3>
+
+                            <div class="agent-profile" style="text-align: center; margin-bottom: 20px;">
+                                <img src="img/Daniel_min.png" alt="Daniel Brarda"
+                                    style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); margin-bottom: 10px;">
+                                <div style="color: #666; font-size: 0.9rem;">M.P. 613 C.I.E.R.</div>
+                                <div style="color: #666; font-size: 0.9rem;">Corredor Público Inmobiliario</div>
+                            </div>
+
+                            <div class="agent-contact-info"
+                                style="font-size: 0.95rem; line-height: 1.8; color: #555; margin-bottom: 25px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <i class="fas fa-phone-alt"
+                                        style="color: var(--primary); width: 20px; text-align: center;"></i>
+                                    <span>Oficina: <a href="tel:+5493456422678"
+                                            style="color: #555; text-decoration: none;">+54 9 3456 422678</a></span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <i class="fas fa-mobile-alt"
+                                        style="color: var(--primary); width: 20px; text-align: center;"></i>
+                                    <span>Celular: <a href="tel:+5493456495561"
+                                            style="color: #555; text-decoration: none;">+54 9 3456 495561</a></span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <i class="fab fa-whatsapp"
+                                        style="color: var(--primary); width: 20px; text-align: center;"></i>
+                                    <span>WhatsApp: <a href="https://wa.me/5493456495561" target="_blank"
+                                            style="color: #555; text-decoration: none;">+54 9 3456 495561</a></span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <i class="fas fa-envelope"
+                                        style="color: var(--primary); width: 20px; text-align: center;"></i>
+                                    <a href="mailto:danielbrarda@servirnet.com"
+                                        style="color: #555; text-decoration: none;">danielbrarda@servirnet.com</a>
+                                </div>
+                            </div>
+
+                            <div class="agent-actions" style="display: flex; gap: 10px; flex-direction: column;">
+                                <a href="#" target="_blank" class="btn-whatsapp-full" id="btn-whatsapp"
+                                    style="margin-bottom: 10px;">
+                                    <i class="fab fa-whatsapp"></i> Consultar por WhatsApp
+                                </a>
+                                <a href="tel:+5493456495561" class="btn"
+                                    style="width: 100%; border: 1px solid var(--primary); color: var(--primary); background: white; border-radius: 8px;">
+                                    <i class="fas fa-phone"></i> Llamar Ahora
+                                </a>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <div class="lightbox-prev" onclick="prevLightboxImage()">&#10094;</div>
+        <img class="lightbox-content" id="lightbox-img">
+        <div class="lightbox-next" onclick="nextLightboxImage()">&#10095;</div>
+    </div>
+
+    <footer id="contacto">
+        <div class="container" style="text-align: center;">
+            <div style="max-width: 800px; margin: 0 auto; margin-bottom: 40px;">
+                <p style="opacity: 0.8; font-size: 0.85rem; line-height: 1.8;">La información contenida en este sitio
+                    web es meramente referencial. Los términos incorporados en él no constituyen una oferta vinculante.
+                    Para información fehaciente dirigirse a nuestras oficinas.</p>
+            </div>
+
+            <div class="footer-bottom">
+                <h3 style="color: white; font-size: 1.2rem; margin-bottom: 15px;">Daniel Brarda Inmobiliaria</h3>
+                <p style="color: #ccc;">Corredor Público Inmobiliario - M.P. 613 C.I.E.R.</p>
+                <p style="color: #ccc;">Roque Sáenz Peña 2315, Chajarí, Entre Ríos</p>
+                <div style="margin-top: 20px;">
+                    <a href="#" style="color: white; margin: 0 10px; font-size: 1.2rem;"><i
+                            class="fab fa-facebook"></i></a>
+                    <a href="#" style="color: white; margin: 0 10px; font-size: 1.2rem;"><i
+                            class="fab fa-instagram"></i></a>
+                    <a href="#" style="color: white; margin: 0 10px; font-size: 1.2rem;"><i
+                            class="fab fa-whatsapp"></i></a>
+                </div>
+                <p style="margin-top: 30px; font-size: 0.8rem; opacity: 0.5; color: #ccc;">© 2025 Todos los derechos
+                    reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/propertiesData.js"></script>
+    <script src="js/detalle.js"></script>
+    <!-- Reutilizamos script principal para menu mobile si es genérico, o copiamos la logica -->
+    <script>
+        // Lógica simple para el menú mobile (ya que scripts.js podría tener conflictos si no se limpia)
+        document.getElementById('mobile-toggle').addEventListener('click', function () {
+            document.getElementById('main-nav').classList.toggle('active');
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > 50) {
+                document.getElementById('main-header').classList.add('scrolled');
+            } else {
+                document.getElementById('main-header').classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+
+</html>
